@@ -10,11 +10,19 @@ exports.xmlSanitize = function(xml, sanitizeArray, attributeArray, splRegex, opt
                     let regex = splRegex ? `|${element}=`+ splRegex : '';
                     //if you want different regex option , then use regexOpt in the optionObj
                     let regexOption = optionObj ? optionObj.regexOpt ? optionObj.regexOpt : `g${ignoreCase ? "i" : ""}` : `g${ignoreCase ? "i" : ""}`;
+                    const search = new RegExp(`<(${element})*[^</]*</(${element})>` + regex, regexOption);
+                    value = value.replace(search, `<$1>${replacement}</$2>`);
+                    if(Array.isArray(attributeArray)){
+                        attributeArray.forEach(ele => {
+                            const search = new RegExp(`${ele}=[\\S][^> ]*` + regex, regexOption);
+                            // console.log(ele + ' ' + search)
+                            value = value.replace(search, `${ele}="${replacement}"`);
+                        })
+                    }
 
-                    const search = new RegExp(`<(${element})[^</]*</(${element})>` + regex, regexOption);
-                    if (attributeArray) {
+                   /* if (attributeArray) {
                         if (attributeArray.includes(element)) {
-                            // console.log(element + ' ' + search)
+                            console.log(element + ' ' + search)
                             value = value.replace(search, `${element}="${replacement}"`);
                         }
                         else {
@@ -23,7 +31,7 @@ exports.xmlSanitize = function(xml, sanitizeArray, attributeArray, splRegex, opt
                     }
                     else {
                         value = value.replace(search, `<$1>${replacement}</$2>`);
-                    }
+                    }*/
                 }
             }
             return value;
@@ -39,6 +47,8 @@ exports.xmlJsonSanitize = function(json, sanitizeArray, attributeArray, splRegex
     var optionObject = optionObj ? optionObj : {}; //{ ignoreCase = true, replacement = "******", regexOpt = `` }
     var maskXmls = (elements, { ignoreCase = false, replacement = "******" } = optionObject) => {
         return value => {
+            value = JSON.stringify(copyOfJson);
+            // console.log('v',value)
             if (typeof value !== "string") {
                 return value;
             }
@@ -46,14 +56,15 @@ exports.xmlJsonSanitize = function(json, sanitizeArray, attributeArray, splRegex
                 for (const element of elements) {
                     let regex = splRegex ? splRegex : '';
                     //if you want different regex option , then use regexOpt in the optionObj
-                    let regexOption = optionObj.regexOpt ? optionObj.regexOpt : `g${ignoreCase ? "i" : ""}`;
-
-                    const search = new RegExp(`<(${element})>[^</]*</(${element})>` + regex, regexOption);
-                    if (attributeArray.includes(element)) {
-                        value = value.replace(search, `${element}="${replacement}"`);
-                    }
-                    else {
-                        value = value.replace(search, `<$1>${replacement}</$2>`);
+                    let regexOption = optionObj ? optionObj.regexOpt ? optionObj.regexOpt : `g${ignoreCase ? "i" : ""}`: '';
+                    const search = new RegExp(`<(${element})*[^</]*</(${element})>` + regex, regexOption);
+                    value = value.replace(search, `<$1>${replacement}</$2>`);
+                    if(Array.isArray(attributeArray)){
+                        attributeArray.forEach(ele => {
+                            const search = new RegExp(`${ele}=[\\S][^> ]*` + regex, regexOption);
+                            // console.log(ele + ' ' + search)
+                            value = value.replace(search, `${ele}="${replacement}"`);
+                        })
                     }
                 }
             }
@@ -61,6 +72,6 @@ exports.xmlJsonSanitize = function(json, sanitizeArray, attributeArray, splRegex
         };
     };
     var maskXml = maskXmls(sanitizeArray);
-    console.log(maskXml(json));
+    // console.log(maskXml(json));
     return maskXml(json);
 };

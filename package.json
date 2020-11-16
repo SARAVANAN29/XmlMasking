@@ -1,16 +1,11 @@
 {
   "name": "xmlmasking",
-  "version": "1.0.0",
-  "description": "This npm is for xml masking using regex",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "version": "1.0.5",
   "author": "saravanan.ts (tssara29@gmail.com)",
   "license": "ISC",
   "repository": {
-    "type": "git",
-    "url": "https://github.com/"
+    "type": "github",
+    "url": "https://github.com/SARAVANAN29/XmlMasking"
   },
   "keywords": [
     "fast",
